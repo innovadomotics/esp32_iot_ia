@@ -20,7 +20,7 @@ const char* WIFI_SSID = "RED-INNOVA";
 const char* WIFI_PASS = "lm24lg07geek#$L";
 
 // Dominio del sitio Netlify (sin https://)
-const char* NETLIFY_HOST    = "esp32-iot.netlify.app";
+const char* NETLIFY_HOST    = "esp32-iot-ia.netlify.app";
 const char* PATH_DATA       = "/.netlify/functions/data";
 const char* PATH_COMMANDS   = "/.netlify/functions/commands";
 
