@@ -1,9 +1,0 @@
-{
-  "name": "esp32-netlify",
-  "version": "1.0.0",
-  "description": "Monitor de temperatura y humedad ESP32 con Netlify",
-  "type": "module",
-  "dependencies": {
-    "@netlify/blobs": "^8.1.0"
-  }
-}
