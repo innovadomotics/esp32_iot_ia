@@ -1,9 +1,12 @@
 
-Los archivos utilizados en el video tutorial estan de los archivos
-zip
+Los archivos utilizados en el video tutorial
+estan en los archivos zip
 
-01_esp32-netlify.rar                                                           
-02_esp32-netlify_Desing.rar                                                    
-Imagenes_GuiaComandos.rar
+- 01_esp32-netlify.rar                                                           
+- 02_esp32-netlify_Desing.rar                                                    
+- Imagenes_GuiaComandos.rar
 
 Descargalos y sigue paso a paso el tutorial
+
+Video Tutorial YouTube
+https://youtu.be/4jR2ZvZhcS8
