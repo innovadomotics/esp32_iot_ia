@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Monitor ESP32</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 40px; }
+    h1 { color: #333; }
+    h2 { color: #555; margin-top: 40px; }
+    .dato { font-size: 2.2rem; margin: 15px; }
+    .label { color: #666; font-size: 1rem; }
+    #estado, #estadoCmd { color: #888; margin-top: 15px; font-size: 0.9rem; }
+    .control {
+      margin: 20px auto; padding: 15px;
+      max-width: 400px; border: 1px solid #ddd; border-radius: 8px;
+      background: #f9f9f9;
+    }
+    .control label { font-size: 1.1rem; display: block; margin: 10px; }
+    input[type="text"] { padding: 8px; font-size: 1rem; width: 60%; }
+    button { padding: 8px 16px; font-size: 1rem; cursor: pointer; }
+    .switch { transform: scale(1.5); margin-right: 10px; }
+  </style>
+</head>
+<body>
+
+  <h1>Monitor ESP32</h1>
+
+  <div class="dato">
+    <div class="label">Temperatura</div>
+    <span id="temp">--</span> °C
+  </div>
+
+  <div class="dato">
+    <div class="label">Humedad</div>
+    <span id="hum">--</span> %
+  </div>
+
+  <div id="estado">Esperando datos...</div>
+
+  <h2>Comandos al ESP32</h2>
+
+  <div class="control">
+    <label>
+      <input type="checkbox" id="switchCtrl" class="switch">
+      Switch
+    </label>
+    <label>
+      Texto: <input type="text" id="textoCtrl" placeholder="mensaje">
+    </label>
+    <button id="enviarBtn">Enviar al ESP32</button>
+    <div id="estadoCmd">Cargando estado actual...</div>
+  </div>
+
+  <script>
+    const API_DATA = '/.netlify/functions/data';
+    const API_CMD  = '/.netlify/functions/commands';
+
+    // --- Lectura periódica del sensor ---
+    async function actualizarSensor() {
+      try {
+        const res = await fetch(API_DATA);
+        const d = await res.json();
+        if (d.temperatura !== undefined) {
+          document.getElementById('temp').textContent = Number(d.temperatura).toFixed(1);
+          document.getElementById('hum').textContent  = Number(d.humedad).toFixed(1);
+          document.getElementById('estado').textContent =
+            'Última lectura: ' + new Date(d.timestamp).toLocaleString();
+        }
+      } catch (e) {
+        document.getElementById('estado').textContent = 'Error de conexión';
+      }
+    }
+
+    // --- Lectura del estado actual de comandos ---
+    async function cargarComandos() {
+      try {
+        const res = await fetch(API_CMD);
+        const c = await res.json();
+        document.getElementById('switchCtrl').checked = !!c.switch;
+        document.getElementById('textoCtrl').value    = c.texto || '';
+        if (c.timestamp) {
+          document.getElementById('estadoCmd').textContent =
+            'Último comando enviado: ' + new Date(c.timestamp).toLocaleString();
+        } else {
+          document.getElementById('estadoCmd').textContent = 'Sin comandos enviados aún';
+        }
+      } catch (e) {
+        document.getElementById('estadoCmd').textContent = 'Error leyendo comandos';
+      }
+    }
+
+    // --- Envío de comandos ---
+    async function enviarComandos() {
+      const sw   = document.getElementById('switchCtrl').checked;
+      const txt  = document.getElementById('textoCtrl').value;
+      try {
+        const res = await fetch(API_CMD, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ switch: sw, texto: txt }),
+        });
+        const r = await res.json();
+        document.getElementById('estadoCmd').textContent =
+          'Comando enviado a las ' + new Date(r.timestamp).toLocaleString();
+      } catch (e) {
+        document.getElementById('estadoCmd').textContent = 'Error enviando comando';
+      }
+    }
+
+    document.getElementById('enviarBtn').addEventListener('click', enviarComandos);
+
+    actualizarSensor();
+    cargarComandos();
+    setInterval(actualizarSensor, 3000);
+  </script>
+</body>
+</html>
